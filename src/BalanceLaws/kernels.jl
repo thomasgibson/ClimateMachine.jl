@@ -38,12 +38,59 @@ are defined for each type that `eq_tends` returns.
 )
 
     tend = Flux{FirstOrder}()
+    tend_fluxd = FluxDifferencing{FirstOrder}()
+    _args = (; state, aux, t, direction)
+    args = merge(_args, (precomputed = precompute(bl, _args, tend),))
+    args2 = (state1=state, aux1=aux, state2=state, aux2=aux, t)
+
+    map(prognostic_vars(bl)) do prog
+        var, name = get_prog_state(flux, prog)
+        val = Σfluxes(prog, eq_tends(prog, bl, tend), bl, args)
+        val += Σtwo_point_fluxes(prog, eq_tends(prog, bl, tend_fluxd), bl, args2)
+        setproperty!(var, name, val)
+    end
+    nothing
+end
+
+@inline function single_point_flux_first_order!(
+    bl::BalanceLaw,
+    flux,
+    state,
+    aux,
+    t,
+    direction,
+)
+
+    tend = Flux{FirstOrder}()
     _args = (; state, aux, t, direction)
     args = merge(_args, (precomputed = precompute(bl, _args, tend),))
 
     map(prognostic_vars(bl)) do prog
         var, name = get_prog_state(flux, prog)
         val = Σfluxes(prog, eq_tends(prog, bl, tend), bl, args)
+        setproperty!(var, name, val)
+    end
+    nothing
+end
+
+@inline function two_point_flux_first_order!(
+    bl::BalanceLaw,
+    flux,
+    state1,
+    aux1,
+    state2,
+    aux2,
+    t,
+)
+    tend = FluxDifferencing{FirstOrder}()
+    _args = (; state1, aux1, state2, aux2, t)
+    #args = merge(_args, (precomputed = precompute(bl, _args, tend),))
+    # TODO: handle precompute
+    args = _args
+
+    map(prognostic_vars(bl)) do prog
+        var, name = get_prog_state(flux, prog)
+        val = Σtwo_point_fluxes(prog, eq_tends(prog, bl, tend), bl, args)
         setproperty!(var, name, val)
     end
     nothing

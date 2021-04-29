@@ -79,6 +79,7 @@ import ..BalanceLaws:
     source!,
     eq_tends,
     flux,
+    two_point_flux,
     precompute,
     parameter_set,
     source,
@@ -238,7 +239,7 @@ default values for each field.
 # Fields
 $(DocStringExtensions.FIELDS)
 """
-struct AtmosModel{FT, PH, PR, O, S, DC} <: BalanceLaw
+struct AtmosModel{FT, PH, PR, O, S, DC, EF} <: BalanceLaw
     "Atmospheric physics"
     physics::PH
     "Problem (initial and boundary conditions)"
@@ -249,6 +250,8 @@ struct AtmosModel{FT, PH, PR, O, S, DC} <: BalanceLaw
     source::S
     "Data Configuration (Helper field for experiment configuration)"
     data_config::DC
+    "Form of equations: (Unsplit, split form, or entropy stable)"
+    equations_form::EF
 end
 
 parameter_set(atmos::AtmosModel) = parameter_set(atmos.physics)
@@ -330,6 +333,7 @@ function AtmosModel{FT}(
         turbconv_sources(turbconv_model(physics))...,
     ),
     data_config = nothing,
+    equations_form = Unsplit()
 ) where {FT <: AbstractFloat}
 
     atmos = (
@@ -338,6 +342,7 @@ function AtmosModel{FT}(
         orientation,
         prognostic_var_source_map(source),
         data_config,
+        equations_form
     )
 
     return AtmosModel{FT, typeof.(atmos)...}(atmos...)
@@ -574,6 +579,7 @@ pressure(::Compressible, ts, aux) = air_pressure(ts)
 pressure(::Anelastic1D, ts, aux) = aux.ref_state.p
 
 include("declare_prognostic_vars.jl") # declare prognostic variables
+include("equations_form.jl")           # types for split forms, etc.
 include("multiphysics_types.jl")      # types for multi-physics tendencies
 include("tendencies_mass.jl")         # specify mass tendencies
 include("tendencies_momentum.jl")     # specify momentum tendencies
