@@ -28,31 +28,25 @@ optionally,
 and individual [`flux`](@ref) kernels that
 are defined for each type that `eq_tends` returns.
 """
-@inline function flux_first_order!(
+@inline function total_flux_first_order!(
     bl::BalanceLaw,
-    flux,
+    flux::Grad{S},
     state,
     aux,
     t,
     direction,
-)
+) where {S}
 
-    tend = Flux{FirstOrder}()
-    tend_fluxd = FluxDifferencing{FirstOrder}()
-    _args = (; state, aux, t, direction)
-    args = merge(_args, (precomputed = precompute(bl, _args, tend),))
-    args2 = (state1=state, aux1=aux, state2=state, aux2=aux, t)
+    flux_first_order!(bl, flux, state, aux, t, direction)
 
-    map(prognostic_vars(bl)) do prog
-        var, name = get_prog_state(flux, prog)
-        val = Σfluxes(prog, eq_tends(prog, bl, tend), bl, args)
-        val += Σtwo_point_fluxes(prog, eq_tends(prog, bl, tend_fluxd), bl, args2)
-        setproperty!(var, name, val)
-    end
-    nothing
+    flux = parent(flux)
+    flux2 = similar(flux)
+    fill!(flux2, -zero(eltype(flux)))
+    two_point_flux_first_order!(bl, Grad{S}(flux2), state, aux, state, aux, t)
+    flux .+= flux2
 end
 
-@inline function single_point_flux_first_order!(
+@inline function flux_first_order!(
     bl::BalanceLaw,
     flux,
     state,

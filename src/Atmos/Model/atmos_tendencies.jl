@@ -16,7 +16,11 @@ eq_tends(pv::AbstractPrognosticVariable, m::AtmosModel, tt::Source) =
 # Dispatch to flux differencing form
 eq_tends(pv::AbstractPrognosticVariable,
          atmos::AtmosModel,
-         tt::Union{Flux{FirstOrder}, FluxDifferencing{FirstOrder}}) =
+         tt::Flux{FirstOrder}) =
+eq_tends(atmos.equations_form, pv, atmos, tt)
+eq_tends(pv::AbstractPrognosticVariable,
+         atmos::AtmosModel,
+         tt::FluxDifferencing{FirstOrder}) =
 eq_tends(atmos.equations_form, pv, atmos, tt)
 
 # Default is no flux differencing

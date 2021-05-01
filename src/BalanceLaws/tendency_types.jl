@@ -125,6 +125,11 @@ prognostic variable in:
 """
 function eq_tends end
 
+# no flux differencing by default
+eq_tends(::AbstractPrognosticVariable,
+         ::BalanceLaw,
+         ::FluxDifferencing{FirstOrder}) = ()
+
 """
     prognostic_vars(::BalanceLaw)
 

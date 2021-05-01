@@ -169,7 +169,7 @@ fluxes, respectively.
 
             # Computes the local inviscid fluxes Fⁱⁿᵛ
             fill!(local_flux, -zero(eltype(local_flux)))
-            single_point_flux_first_order_arr!(
+            flux_first_order_arr!(
                 balance_law,
                 local_flux,
                 local_state_prognostic,
@@ -224,7 +224,7 @@ fluxes, respectively.
             if model_direction isa EveryDirection && balance_law isa RemBL
                 if rembl_has_subs_direction(HorizontalDirection(), balance_law)
                     fill!(local_flux, -zero(eltype(local_flux)))
-                    single_point_flux_first_order_arr!(
+                    flux_first_order_arr!(
                         balance_law,
                         local_flux,
                         local_state_prognostic,
@@ -417,7 +417,7 @@ end
 
             # Computes the local inviscid fluxes Fⁱⁿᵛ
             fill!(local_flux, -zero(eltype(local_flux)))
-            single_point_flux_first_order_arr!(
+            flux_first_order_arr!(
                 balance_law,
                 local_flux,
                 local_state_prognostic,
@@ -468,7 +468,7 @@ end
             if model_direction isa EveryDirection && balance_law isa RemBL
                 if rembl_has_subs_direction(VerticalDirection(), balance_law)
                     fill!(local_flux, -zero(eltype(local_flux)))
-                    single_point_flux_first_order_arr!(
+                    flux_first_order_arr!(
                         balance_law,
                         local_flux,
                         local_state_prognostic,

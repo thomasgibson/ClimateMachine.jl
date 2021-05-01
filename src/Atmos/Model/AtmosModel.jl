@@ -75,6 +75,7 @@ import ..BalanceLaws:
     get_prog_state,
     get_specific_state,
     flux_first_order!,
+    total_flux_first_order!,
     flux_second_order!,
     source!,
     eq_tends,
@@ -1126,7 +1127,7 @@ function numerical_flux_first_order!(
     # interior facets
     flux⁻ = similar(parent(fluxᵀn), Size(3, num_state_prognostic))
     fill!(flux⁻, -zero(FT))
-    flux_first_order!(
+    total_flux_first_order!(
         balance_law,
         Grad{S}(flux⁻),
         state_prognostic⁻,
@@ -1138,7 +1139,7 @@ function numerical_flux_first_order!(
 
     flux⁺ = similar(flux⁻)
     fill!(flux⁺, -zero(FT))
-    flux_first_order!(
+    total_flux_first_order!(
         balance_law,
         Grad{S}(flux⁺),
         state_prognostic⁺,

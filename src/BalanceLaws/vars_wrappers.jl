@@ -57,7 +57,7 @@ function flux_first_order_arr!(
     )
 end
 
-function single_point_flux_first_order_arr!(
+function total_flux_first_order_arr!(
     balance_law,
     flux::AbstractArray,
     state::AbstractArray,
@@ -66,7 +66,7 @@ function single_point_flux_first_order_arr!(
     direction,
 )
     FT = eltype(state)
-    single_point_flux_first_order!(
+    total_flux_first_order!(
         balance_law,
         Grad{vars_state(balance_law, Prognostic(), FT)}(flux),
         Vars{vars_state(balance_law, Prognostic(), FT)}(state),

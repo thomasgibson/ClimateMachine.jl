@@ -1,3 +1,5 @@
+export Unsplit, CentralSplitForm, KennedyGruberSplitForm
+
 abstract type AbstractEquationsForm end
 struct Unsplit <: AbstractEquationsForm end
 struct KennedyGruberSplitForm <: AbstractEquationsForm end
